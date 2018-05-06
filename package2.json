@@ -1,0 +1,25 @@
+{
+  "name": "take-screenshot",
+  "version": "1.0.0",
+  "description": "screenshot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rodrigo3d/take-screenshot.git"
+  },
+  "keywords": [
+    "screenshot"
+  ],
+  "author": "Rodrigo Ribeiro",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rodrigo3d/take-screenshot/issues"
+  },
+  "homepage": "https://github.com/rodrigo3d/take-screenshot#readme",
+  "dependencies": {
+    "phantom": "^4.0.8"
+  }
+}
