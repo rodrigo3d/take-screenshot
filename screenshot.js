@@ -10,22 +10,30 @@ const server = http.createServer(async (req, res) => {
   try {
     const { host } = req.headers;
     const searchParams = new URLSearchParams(req.url.slice(1));
-    url = searchParams.get("url");
-    const width = parseInt(searchParams.get("width"), 10) || 1024;
-    const height = parseInt(searchParams.get("height"), 10) || 600;
-    const delay = searchParams.get("delay") || 0;
-    const clipRect = searchParams.get("clipRect");
-    let clip;
-    if (clipRect) {
-      cr = JSON.parse(clipRect);
-      clip = {
-        x: cr.left || 0,
-        y: cr.top || 0,
-        width: cr.width || width,
-        height: cr.height || height
-      };
+    if (req.url.indexOf("screenshots")) {
+      res.writeHead(200, {
+         "content-type": "image/png",
+         "cache-control": "public,max-age=31536000"
+         });
+         res.end(req.url);
+        //res.end(JSON.stringify({ status: 200, message: '123123123132' }));
+    } else {
+      url = searchParams.get("url");
+      const width = parseInt(searchParams.get("width"), 10) || 1024;
+      const height = parseInt(searchParams.get("height"), 10) || 600;
+      const delay = searchParams.get("delay") || 0;
+      const clipRect = searchParams.get("clipRect");
+      let clip;
+      if (clipRect) {
+        cr = JSON.parse(clipRect);
+        clip = {
+          x: cr.left || 0,
+          y: cr.top || 0,
+          width: cr.width || width,
+          height: cr.height || height
+        };
+      }
     }
-
     page = await browser.newPage();
 
     start = Date.now();
@@ -74,42 +82,37 @@ const server = http.createServer(async (req, res) => {
       clip
     });
 
-    res.writeHead(200, {
-      "content-type": "image/png",
-      "cache-control": "public,max-age=31536000"
-    });
-
     /*
+    *
     * Rodrigo Ribeiro
     *
-    */
-    // const urlIMAGE = url.replace(/(^\w+:|^)\/\//, '');
-    // const screenshotIMAGE = await page.screenshot({
-    //   path: __dirname + '/screenshots/' + urlIMAGE + '.png'
-    // });
-    //res.end(screenshotIMAGE, "binary");
-    //console.log(`\n\n${urlIMAGE}\n\n`)
-
-    // res.writeHead(200, {
-    //   "content-type": "application/json"
-    // });
-    // res.end(JSON.stringify({
-    //   url: url,
-    //   status: 200,
-    //   size: screenshot.length,
-    //   width: width,
-    //   height: height,
-    //   delay: delay,
-    //   clip: clip,
-    //   img: '/screenshots/' + urlIMAGE + '.png'
-    // })
-    // );
-    /*
-    *
-    *
+    * Código original
+    * res.writeHead(200, {
+    * "content-type": "image/png",
+    * "cache-control": "public,max-age=31536000"
+    * });
+    * res.end(screenshot, "binary");
     */
 
-    res.end(screenshot, "binary");
+    res.writeHead(200, {
+      "content-type": "application/json"
+    });
+
+    const urlIMAGE = url.replace(/(^\w+:|^)\/\//, '');
+    const screenshotIMAGE = await page.screenshot({
+      path: __dirname + '/screenshots/' + urlIMAGE + '.png'
+    });
+
+    res.end(JSON.stringify({
+      url: url,
+      status: 200,
+      size: screenshot.length,
+      width: width,
+      height: height,
+      delay: delay,
+      clip: clip,
+      img: '/screenshots/' + urlIMAGE + '.png'
+    }));
 
     const duration = Date.now() - start;
     const clipstr = (clip && JSON.stringify(clip)) || "none";
@@ -120,10 +123,21 @@ const server = http.createServer(async (req, res) => {
     );
   } catch (e) {
     const { message = "", stack = "" } = e;
+
+    /*
+    *
+    * Rodrigo Ribeiro
+    *
+    * Código original
+    * res.writeHead(500, {
+    * "content-type": "text/plain"
+    * });
+    * res.end(`Error generating screenshot.\n\n${message}\n\n${stack}`);
+    */
     res.writeHead(500, {
-      "content-type": "text/plain"
+      "content-type": "application/json"
     });
-    res.end(`Error generating screenshot.\n\n${message}\n\n${stack}`);
+    res.end(JSON.stringify({ status: 500, message: message }));
 
     const duration = Date.now() - start;
     console.log(`url=${url} timing=${duration} status=500 error="${message}"`);

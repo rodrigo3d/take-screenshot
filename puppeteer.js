@@ -64,7 +64,7 @@ const server = http.createServer(async (req, res) => {
               m.preload = "none";
             });
           })
-          .catch(err => { }); // swallow errors
+          .catch(err => {}); // swallow errors
       })
     );
 
@@ -78,44 +78,13 @@ const server = http.createServer(async (req, res) => {
       "content-type": "image/png",
       "cache-control": "public,max-age=31536000"
     });
-
-    /*
-    * Rodrigo Ribeiro
-    *
-    */
-    // const urlIMAGE = url.replace(/(^\w+:|^)\/\//, '');
-    // const screenshotIMAGE = await page.screenshot({
-    //   path: __dirname + '/screenshots/' + urlIMAGE + '.png'
-    // });
-    //res.end(screenshotIMAGE, "binary");
-    //console.log(`\n\n${urlIMAGE}\n\n`)
-
-    // res.writeHead(200, {
-    //   "content-type": "application/json"
-    // });
-    // res.end(JSON.stringify({
-    //   url: url,
-    //   status: 200,
-    //   size: screenshot.length,
-    //   width: width,
-    //   height: height,
-    //   delay: delay,
-    //   clip: clip,
-    //   img: '/screenshots/' + urlIMAGE + '.png'
-    // })
-    // );
-    /*
-    *
-    *
-    */
-
     res.end(screenshot, "binary");
 
     const duration = Date.now() - start;
     const clipstr = (clip && JSON.stringify(clip)) || "none";
     console.log(
       `url=${url} timing=${duration} size=${
-      screenshot.length
+        screenshot.length
       } status=200 width=${width} height=${height} delay=${delay} clip="${clipstr}"`
     );
   } catch (e) {
@@ -134,11 +103,11 @@ const server = http.createServer(async (req, res) => {
         const cookies = await page.cookies();
         await page.deleteCookie(...cookies);
         // tip from https://github.com/GoogleChrome/puppeteer/issues/1490
-        await page.goto("about:blank", { timeout: 1000 }).catch(err => { });
+        await page.goto("about:blank", { timeout: 1000 }).catch(err => {});
       } catch (ex) {
         // intentionally empty
       } finally {
-        page.close().catch(err => { });
+        page.close().catch(err => {});
         page = null;
       }
     }
